@@ -1,1 +1,32 @@
+def create_dataframe_difference_mode(df):
+    """
+    Create a new DataFrame where each cell is the difference from the mode of the original column,
+    with values grouped into 100 equal intervals.
 
+    Parameters
+    ----------
+    df: pandas.DataFrame
+        Original DataFrame
+
+    Returns
+    -------
+    pandas.DataFrame
+        New DataFrame where each cell is the difference from the mode
+    """
+
+    df_diff_mode = df.copy()
+
+    for column in df.columns:
+        # Calculate bin edges with 100 equal intervals
+        bins = np.linspace(df[column].min(), df[column].max(), 101)
+
+        # Group data into bins
+        df_diff_mode[column] = pd.cut(df[column], bins=bins, labels=False, include_lowest=True)
+
+        # Get mode of each group
+        mode_group = df_diff_mode[column].mode().iloc[0] if not df_diff_mode[column].mode().empty else 0
+
+        # Calculate the difference from the mode
+        df_diff_mode[column] = df_diff_mode[column] - mode_group
+
+    return df_diff_mode
